@@ -1,0 +1,28 @@
+{
+  "name": "stripe-subscription-backend",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/BeamlakTesfahun/stripe-subscription-backend#readme",
+  "bugs": {
+    "url": "https://github.com/BeamlakTesfahun/stripe-subscription-backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BeamlakTesfahun/stripe-subscription-backend.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.7.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "prisma": "^7.7.0",
+    "stripe": "^22.0.0"
+  }
+}
