@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  PAUSED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+model User {
+  id               String         @id @default(cuid())
+  fullName         String?
+  email            String         @unique
+  password         String
+  stripeCustomerId String?        @unique
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  subscriptions    Subscription[]
+  payments         Payment[]
+}
+
+model Plan {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  stripePriceId String         @unique
+  amount        Int
+  currency      String         @default("usd")
+  interval      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                    String             @id @default(cuid())
+  userId                String
+  planId                String
+  stripeSubscriptionId  String             @unique
+  stripeCustomerId      String
+  status                SubscriptionStatus
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                  Plan               @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([planId])
+  @@index([stripeCustomerId])
+}
+
+model Payment {
+  id                    String         @id @default(cuid())
+  userId                String
+  subscriptionId        String?
+  stripePaymentIntentId String?        @unique
+  stripeInvoiceId       String?        @unique
+  amount                Int
+  currency              String         @default("usd")
+  status                PaymentStatus
+  paidAt                DateTime?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([subscriptionId])
+}
+
+model WebhookEvent {
+  id              String   @id @default(cuid())
+  stripeEventId   String   @unique
+  type            String
+  processed       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
