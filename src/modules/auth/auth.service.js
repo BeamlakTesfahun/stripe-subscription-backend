@@ -11,14 +11,6 @@ const generateToken = (userId) => {
 const registerUser = async (payload) => {
     const { fullName, email, password } = payload;
 
-    if (!email || !password) {
-        throw new AppError(
-            'Email and password are required.',
-            400,
-            'VALIDATION_ERROR',
-        );
-    }
-
     const existingUser = await prisma.user.findUnique({
         where: { email },
     });
@@ -50,14 +42,6 @@ const registerUser = async (payload) => {
 
 const loginUser = async (payload) => {
     const { email, password } = payload;
-
-    if (!email || !password) {
-        throw new AppError(
-            'Email and password are required.',
-            400,
-            'VALIDATION_ERROR',
-        );
-    }
 
     const user = await prisma.user.findUnique({
         where: { email },
